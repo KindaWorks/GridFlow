@@ -1,0 +1,13 @@
+{
+  "parent": "block/cube",
+  "textures": {
+    "down": "rsfactory:block/bottom",
+    "up": "rsfactory:block/top",
+    "north": "rsfactory:block/front",
+    "east": "rsfactory:block/left",
+    "south": "rsfactory:block/back",
+    "west": "rsfactory:block/right",
+    "particle": "rsfactory:block/bottom"
+  },
+  "render_type": "cutout_mipped"
+}

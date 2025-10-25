@@ -1,0 +1,11 @@
+{
+  "_fv": 79,
+  "_type": "tab",
+  "definition": {
+    "name": "RS Factory",
+    "icon": {
+      "value": "CUSTOM:FactoryMonitor"
+    },
+    "showSearch": false
+  }
+}

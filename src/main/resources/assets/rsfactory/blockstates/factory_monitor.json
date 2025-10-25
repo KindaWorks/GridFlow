@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "rsfactory:block/factory_monitor"
+    },
+    "facing=east": {
+      "model": "rsfactory:block/factory_monitor",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "rsfactory:block/factory_monitor",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "rsfactory:block/factory_monitor",
+      "y": 270
+    }
+  }
+}
