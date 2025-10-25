@@ -1,0 +1,19 @@
+{
+<<<<<<< HEAD:src/main/resources/assets/rsfactory/models/block/factory_monitor.json
+  "parent": "block/cube",
+  "textures": {
+=======
+  "parent": "refinedstorage:block/north_cutout",
+  "textures": {
+    "cutout": "rsfactory:block/factory_monitor/cutouts/inactive",
+>>>>>>> eb00122 (Refactor):src/main/resources/assets/rsfactory/models/block/factory_monitor/inactive.json
+    "down": "rsfactory:block/bottom",
+    "up": "rsfactory:block/top",
+    "north": "rsfactory:block/front",
+    "east": "rsfactory:block/left",
+    "south": "rsfactory:block/back",
+    "west": "rsfactory:block/right",
+    "particle": "rsfactory:block/bottom"
+  },
+  "render_type": "cutout_mipped"
+}
