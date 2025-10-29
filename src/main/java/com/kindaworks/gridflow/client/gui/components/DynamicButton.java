@@ -5,7 +5,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.WidgetSprites;
-import net.minecraft.client.gui.components.WidgetTooltipHolder;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.resources.ResourceLocation;
 
@@ -22,7 +21,6 @@ public class DynamicButton {
     private final int x, y, width, height;
     private final String label;
     private final Font font;
-    private final WidgetTooltipHolder tooltip = new WidgetTooltipHolder();
     private final List<ClientTooltipComponent> tooltipLines;
 
     /**

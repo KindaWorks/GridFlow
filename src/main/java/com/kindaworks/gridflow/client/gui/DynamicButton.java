@@ -51,12 +51,7 @@ public class DynamicButton {
 
     public void render(GuiGraphics graphics, int mouseX, int mouseY) {
         boolean hovered = isMouseOver(mouseX, mouseY);
-
-        int color = hovered ? 0xFFAAAAAA : 0xFF666666;
-        // p_281670_.blitSprite(SPRITES.get(this.active, this.isHoveredOrFocused()),
-        // this.getX(), this.getY(), this.getWidth(), this.getHeight());
         graphics.blitSprite(sprites.get(true, hovered), x, y, width, height);
-        // graphics.fill(x, y, x + width, y + height, color);
         graphics.drawString(font, label, x + 5, y + 6, 0xFFFFFF);
         if (overlay != null) {
             graphics.blitSprite(overlay, x, y, width, height);

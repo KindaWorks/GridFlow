@@ -10,7 +10,7 @@ import net.neoforged.api.distmarker.Dist;
 
 import com.kindaworks.gridflow.client.gui.FlowScopeMenuScreen;
 
-@EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+@EventBusSubscriber(value = Dist.CLIENT)
 public class GridFlowModScreens {
 	@SubscribeEvent
 	public static void clientLoad(RegisterMenuScreensEvent event) {

@@ -30,6 +30,7 @@ public record MenuStateUpdateMessage(int elementType, String name, Object elemen
     public static final Type<MenuStateUpdateMessage> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(GridFlowMod.MODID, "guistate_update"));
     public static final StreamCodec<RegistryFriendlyByteBuf, MenuStateUpdateMessage> STREAM_CODEC = StreamCodec.of(MenuStateUpdateMessage::write, MenuStateUpdateMessage::read);
 
+    @SuppressWarnings("unchecked")
     public static void write(FriendlyByteBuf buffer, MenuStateUpdateMessage message) {
         buffer.writeInt(message.elementType);
         buffer.writeUtf(message.name);

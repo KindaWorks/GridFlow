@@ -70,7 +70,6 @@ public class FlowScopeMenuScreen extends AbstractContainerScreen<FlowScopeMenuMe
     ScrollbarWidget scrollbar;
     Granularity granularity = Granularity.MINUTE;
     TickScheduler tickScheduler = new TickScheduler(granularity.getTickAmount());
-    private boolean menuStateUpdateActive = false;
     private Map<PlatformResourceKey, Map<Short, Long>> lastSnapshot = new HashMap<>();
     private boolean hasDetailedGenerationData = false;
 
@@ -261,16 +260,15 @@ public class FlowScopeMenuScreen extends AbstractContainerScreen<FlowScopeMenuMe
         }
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void updateMenuState(int elementType, String name, Object elementState) {
-        menuStateUpdateActive = true;
         if (name.equals("detailedFactoryGeneration")) {
             graph.setData((Map<ResourceChangeGranularityKey, long[]>) elementState, granularity);
             hasDetailedGenerationData = true;
         } else if (name.equals("lastSnapshot")) {
             lastSnapshot = (Map<PlatformResourceKey, Map<Short, Long>>) elementState;
         }
-        menuStateUpdateActive = false;
     }
 
     //#endregion

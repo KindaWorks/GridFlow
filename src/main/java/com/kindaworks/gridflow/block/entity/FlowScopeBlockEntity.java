@@ -22,15 +22,12 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.state.BlockState;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.Optional;
 
 public class FlowScopeBlockEntity extends AbstractBaseNetworkNodeContainerBlockEntity<FlowScopeBlockEntity.FlowScopeNetworkNode> {
-    private static final Logger log = LoggerFactory.getLogger(FlowScopeBlockEntity.class);
     public int TAG_FACTORY_ID;
     private TickScheduler saveScheduler = new TickScheduler(20);
     private GridFlowSnapshotData snapshotData;
