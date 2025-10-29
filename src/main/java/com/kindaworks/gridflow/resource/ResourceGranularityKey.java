@@ -1,4 +1,4 @@
-package com.kindaworks.rsfactory.resource;
+package com.kindaworks.gridflow.resource;
 
 import com.refinedmods.refinedstorage.common.api.support.resource.PlatformResourceKey;
 
