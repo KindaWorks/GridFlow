@@ -31,7 +31,7 @@ import java.util.stream.Stream;
  * Stores the graph data and displays the graph.
  */
 public class FlowScopeGraph {
-    //#region Properties
+    // #region Properties
     private final int MINECRAFT_STYLE_VERTICAL_RESOLUTION = 1; // config value?
     private final int HEIGHT = 80;
     private final int WIDTH = 200;
@@ -62,7 +62,7 @@ public class FlowScopeGraph {
     private int selectedIndex = -1;
     private boolean loading = true;
 
-    //#region Getters
+    // #region Getters
     public Vector2i getGraphSize() {
         return new Vector2i(WIDTH, HEIGHT);
     }
@@ -91,8 +91,8 @@ public class FlowScopeGraph {
         return loading;
     }
 
-    //#endregion
-    //#region Setters
+    // #endregion
+    // #region Setters
 
     public void setLoading(boolean loading) {
         this.loading = loading;
@@ -105,26 +105,37 @@ public class FlowScopeGraph {
 
     public void setData(Map<ResourceChangeGranularityKey, long[]> data, Granularity granularity) {
         ResourceChangeGranularityKey rgk = data.keySet().stream().findFirst().orElse(null);
-        if (rgk == null) return;
+        if (rgk == null)
+            return;
         this.itemKey = rgk.resourceKey();
         this.granularity = granularity;
-        this.productionData = data.getOrDefault(new ResourceChangeGranularityKey(itemKey, (short) +1, granularity.getTickAmount()), new long[0]);
-        this.consumptionData = data.getOrDefault(new ResourceChangeGranularityKey(itemKey, (short) -1, granularity.getTickAmount()), new long[0]);
-        this.netData = IntStream.range(0, productionData.length).mapToLong(i -> productionData[i] - consumptionData[i]).toArray();
-        this.totalStored = Arrays.stream(data.getOrDefault(new ResourceChangeGranularityKey(itemKey, (short) 0, granularity.getTickAmount()), new long[0])).findAny().orElse(0L);
-        this.maxValue = Math.max(Arrays.stream(productionData).max().orElse(0L), Arrays.stream(consumptionData).max().orElse(0L));
-        this.minValue = Math.max(Arrays.stream(productionData).min().orElse(0L), Arrays.stream(consumptionData).min().orElse(0L));
+        this.productionData = data.getOrDefault(
+                new ResourceChangeGranularityKey(itemKey, (short) +1, granularity.getTickAmount()), new long[0]);
+        this.consumptionData = data.getOrDefault(
+                new ResourceChangeGranularityKey(itemKey, (short) -1, granularity.getTickAmount()), new long[0]);
+        this.netData = IntStream.range(0, productionData.length).mapToLong(i -> productionData[i] - consumptionData[i])
+                .toArray();
+        this.totalStored = Arrays
+                .stream(data.getOrDefault(
+                        new ResourceChangeGranularityKey(itemKey, (short) 0, granularity.getTickAmount()), new long[0]))
+                .findAny().orElse(0L);
+        this.maxValue = Math.max(Arrays.stream(productionData).max().orElse(0L),
+                Arrays.stream(consumptionData).max().orElse(0L));
+        this.minValue = Math.max(Arrays.stream(productionData).min().orElse(0L),
+                Arrays.stream(consumptionData).min().orElse(0L));
         this.pointsAmount = (int) Arrays.stream(productionData).count();
 
         this.dataTimeStamp = LocalDateTime.now();
         this.loading = false;
     }
 
-    //#endregion
-    //#endregion Properties
-    //#region Drawing methods
-    public void drawLine(GuiGraphics guiGraphics, double x1, double y1, double x2, double y2, int color, int thickness, LineStyle lineStyle) {
-        // I've decided to go with .fill(), because it gives more Minecraft'y result than nice and straight GL-rendered lines.
+    // #endregion
+    // #endregion Properties
+    // #region Drawing methods
+    public void drawLine(GuiGraphics guiGraphics, double x1, double y1, double x2, double y2, int color, int thickness,
+            LineStyle lineStyle) {
+        // I've decided to go with .fill(), because it gives more Minecraft'y result
+        // than nice and straight GL-rendered lines.
         if (lineStyle == LineStyle.BLOCKY) {
             Vector2d p1 = new Vector2d(
                     x1,
@@ -132,7 +143,8 @@ public class FlowScopeGraph {
             Vector2d p2 = new Vector2d(
                     x2,
                     Math.floor(y2 / MINECRAFT_STYLE_VERTICAL_RESOLUTION) * MINECRAFT_STYLE_VERTICAL_RESOLUTION);
-            guiGraphics.fill((int) p1.x, (int) p1.y, (int) p2.x, (int) (p2.y == p1.y ? p2.y + MINECRAFT_STYLE_VERTICAL_RESOLUTION : p2.y), color);
+            guiGraphics.fill((int) p1.x, (int) p1.y, (int) p2.x,
+                    (int) (p2.y == p1.y ? p2.y + MINECRAFT_STYLE_VERTICAL_RESOLUTION : p2.y), color);
 
         } else if (lineStyle == LineStyle.EXACT) {
             double ht = thickness / 2f;
@@ -143,15 +155,15 @@ public class FlowScopeGraph {
                     new Vector2d((float) (x1 + tx), (float) (y1 + ty)),
                     new Vector2d((float) (x1 - tx), (float) (y1 - ty)),
                     new Vector2d((float) (x2 - tx), (float) (y2 - ty)),
-                    new Vector2d((float) (x2 + tx), (float) (y2 + ty))
-            );
+                    new Vector2d((float) (x2 + tx), (float) (y2 + ty)));
             Matrix4f matrix4f = guiGraphics.pose().last().pose();
             VertexConsumer vc = guiGraphics.bufferSource().getBuffer(RenderType.gui());
             points.forEach(p -> vc.addVertex(matrix4f, (float) p.x, (float) p.y, 0f).setColor(color));
             guiGraphics.flush();
 
             // debug
-//            guiGraphics.fill((int) (x1 - ht + 1), (int) (y1 - ht + 1), (int) (x1 + ht - 1), (int) (y1 + ht - 1), color);
+            // guiGraphics.fill((int) (x1 - ht + 1), (int) (y1 - ht + 1), (int) (x1 + ht -
+            // 1), (int) (y1 + ht - 1), color);
         }
     }
 
@@ -170,12 +182,12 @@ public class FlowScopeGraph {
 
                     int color = 0xff000000 + baseColor
                             + ((0x010000 * Math.round(((i + 1) * 1f / maxIdx) * targetR))
-                            + (0x000100 * Math.round(((i + 1) * 1f / maxIdx) * targetG))
-                            + (Math.round(((i + 1) * 1f / maxIdx) * targetB)));
+                                    + (0x000100 * Math.round(((i + 1) * 1f / maxIdx) * targetG))
+                                    + (Math.round(((i + 1) * 1f / maxIdx) * targetB)));
                     int prevColor = 0xff000000 + baseColor
                             + ((0x010000 * Math.round((i * 1f / maxIdx) * targetR))
-                            + (0x000100 * Math.round((i * 1f / maxIdx) * targetG))
-                            + (Math.round((i * 1f / maxIdx) * targetB)));
+                                    + (0x000100 * Math.round((i * 1f / maxIdx) * targetG))
+                                    + (Math.round((i * 1f / maxIdx) * targetB)));
 
                     Matrix4f matrix4f = guiGraphics.pose().last().pose();
                     VertexConsumer vc = guiGraphics.bufferSource().getBuffer(RenderType.gui());
@@ -188,15 +200,16 @@ public class FlowScopeGraph {
     }
 
     public void drawGraph(GuiGraphics guiGraphics, List<Vector2d> points, int thickness, int color) {
-        getPairStream(points).forEach(p -> drawLine(guiGraphics, p.prev.x, p.prev.y, p.cur.x, p.cur.y, color, thickness, lineStyle));
+        getPairStream(points)
+                .forEach(p -> drawLine(guiGraphics, p.prev.x, p.prev.y, p.cur.x, p.cur.y, color, thickness, lineStyle));
     }
 
     public void drawGraph(GuiGraphics guiGraphics, long[] arr, int thickness, int color) {
         drawGraph(guiGraphics, getGuiXYArrayD(arr), thickness, color);
     }
 
-    //#endregion
-    //#region Draw graph
+    // #endregion
+    // #region Draw graph
     public void drawGraphs(GuiGraphics graphics) {
         List<Vector2d> netPoints = getGuiXYArrayD(netData);
         drawGradientBg(graphics, netPoints, GRAPH_GRADIENT_FROM, GRAPH_GRADIENT_TO);
@@ -205,8 +218,8 @@ public class FlowScopeGraph {
         drawGraph(graphics, consumptionData, 1, CONSUMPTION_GRAPH_COLOR);
     }
 
-    //#endregion
-    //#region Rendering utils
+    // #endregion
+    // #region Rendering utils
     public ResourceRendering getResourceRendering() {
         return RefinedStorageClientApi.INSTANCE.getResourceRendering(itemKey.getClass());
     }
@@ -219,11 +232,12 @@ public class FlowScopeGraph {
         getResourceRendering().render(itemKey, guiGraphics, x, y);
     }
 
-    //#endregion
-    //#region Value Translators
+    // #endregion
+    // #region Value Translators
     public Vector2i getGuiXYFromGraphValue(Integer index, Long value) {
         int x = (int) ((WIDTH / Math.max(1, pointsAmount - 1f)) * index);
-        if (maxValue - minValue == 0) return new Vector2i(left + x, bottom - (HEIGHT / 2));
+        if (maxValue - minValue == 0)
+            return new Vector2i(left + x, bottom - (HEIGHT / 2));
         int y = (int) ((Math.max(value, 0f) / maxValue) * HEIGHT);
         return new Vector2i(left + x, bottom - y);
     }
@@ -244,9 +258,9 @@ public class FlowScopeGraph {
         return getGuiXYArray(arr).stream().map(v -> new Vector2d(v.x, v.y)).toList();
     }
 
-    //#endregion
-    //#region Calculations
-    //#region Production
+    // #endregion
+    // #region Calculations
+    // #region Production
     public Long getMaxProduction() {
         return Arrays.stream(productionData).max().orElse(0L);
     }
@@ -259,8 +273,8 @@ public class FlowScopeGraph {
         return Arrays.stream(productionData).average().orElse(0.0);
     }
 
-    //#endregion
-    //#region Consumption
+    // #endregion
+    // #region Consumption
     public Long getMaxConsumption() {
         return Arrays.stream(consumptionData).max().orElse(0L);
     }
@@ -273,15 +287,15 @@ public class FlowScopeGraph {
         return Arrays.stream(consumptionData).average().orElse(0.0);
     }
 
-    //#endregion
-    //#region Net
+    // #endregion
+    // #region Net
     public double getNetAvg() {
         return Arrays.stream(netData).average().orElse(0.0);
     }
 
-    //#endregion
-    //#endregion
-    //#region Hooks
+    // #endregion
+    // #endregion
+    // #region Hooks
     public boolean isInBounds(int mouseX, int mouseY) {
         return mouseY <= bottom && mouseY >= bottom - HEIGHT && mouseX >= left && mouseX <= left + WIDTH;
     }
@@ -304,9 +318,11 @@ public class FlowScopeGraph {
     }
 
     public void renderTooltip(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        if (!isInBounds(mouseX, mouseY) && (selectedIndex == -1)) return;
+        if (!isInBounds(mouseX, mouseY) && (selectedIndex == -1))
+            return;
         int index = getGraphValueFromGuiXY(mouseX, mouseY).x;
-        if ((index < 0 || index >= pointsAmount) && selectedIndex == -1) return; // just additional precaution
+        if ((index < 0 || index >= pointsAmount) && selectedIndex == -1)
+            return; // just additional precaution
 
         int indexFrom = selectedIndex != -1 ? Math.min(Math.max(0, index), selectedIndex) : index;
         int indexTo = selectedIndex != -1 ? Math.max(Math.min(index, pointsAmount - 1) + 1, selectedIndex) : index + 1;
@@ -317,8 +333,9 @@ public class FlowScopeGraph {
 
         LocalDateTime indexDate = dataTimeStamp.minus(pointsAmount - indexFrom, granularity.getChronoUnit());
         LocalDateTime nextIndexDate = dataTimeStamp.minus(pointsAmount - (indexTo), granularity.getChronoUnit());
-        long incvalue = Arrays.stream(productionData).skip(indexFrom).limit(indexTo - indexFrom).sum();
-        long decvalue = Arrays.stream(consumptionData).skip(indexFrom).limit(indexTo - indexFrom).sum();
+        // Math.max and Math.abs are here as a precaution
+        long incvalue = Math.max(0, Arrays.stream(productionData).skip(indexFrom).limit(indexTo - indexFrom).sum());
+        long decvalue = Math.abs(Arrays.stream(consumptionData).skip(indexFrom).limit(indexTo - indexFrom).sum());
 
         ResourceRendering resourceRendering = RefinedStorageClientApi.INSTANCE.getResourceRendering(itemKey.getClass());
         List<ClientTooltipComponent> lines = new ArrayList<>();
@@ -328,16 +345,18 @@ public class FlowScopeGraph {
                 "Flow between " +
                         indexDate.format(DateTimeFormatter.ofPattern("HH:mm:ss")) +
                         " and " +
-                        nextIndexDate.format(DateTimeFormatter.ofPattern("HH:mm:ss"))
-        )));
-        lines.add(new SmallTextClientTooltipComponent(Component.literal(String.format("Inflow:  +%,d", incvalue)).withColor(0xff00ff00)));
-        lines.add(new SmallTextClientTooltipComponent(Component.literal(String.format("Outflow: -%,d", decvalue)).withColor(0xffff0000)));
-        lines.add(new SmallTextClientTooltipComponent(Component.literal(String.format("Netflow: %,d", incvalue - decvalue)).withColor(0xff66ddff)));
+                        nextIndexDate.format(DateTimeFormatter.ofPattern("HH:mm:ss")))));
+        lines.add(new SmallTextClientTooltipComponent(
+                Component.literal(String.format("Inflow:  +%,d", incvalue)).withColor(0xff00ff00)));
+        lines.add(new SmallTextClientTooltipComponent(
+                Component.literal(String.format("Outflow: -%,d", decvalue)).withColor(0xffff0000)));
+        lines.add(new SmallTextClientTooltipComponent(
+                Component.literal(String.format("Netflow: %,d", incvalue - decvalue)).withColor(0xff66ddff)));
         Platform.INSTANCE.renderTooltip(guiGraphics, lines, mouseX, mouseY);
     }
 
-    //#endregion
-    //#region Value utils
+    // #endregion
+    // #region Value utils
     private Stream<PointPair> getPairStream(List<Vector2d> points) {
         return IntStream.range(0, points.size())
                 .mapToObj(i -> new PointPair(i == 0 ? points.get(i) : points.get(i - 1), points.get(i)));
@@ -345,5 +364,5 @@ public class FlowScopeGraph {
 
     private record PointPair(Vector2d prev, Vector2d cur) {
     }
-    //#endregion
+    // #endregion
 }
