@@ -23,7 +23,8 @@ public class FlowScopeStorageListener implements RootStorageListener {
     public long afterInsert(ResourceKey resourceKey, long amount) {
         ResourceChangeKey snapshotKey = new ResourceChangeKey((PlatformResourceKey) resourceKey, (short) +1);
         try {
-            snapshotKey = new ResourceChangeKey((PlatformResourceKey) ((ItemResource) snapshotKey.resourceKey()).normalize(), (short) +1);
+            snapshotKey = new ResourceChangeKey(
+                    (PlatformResourceKey) ((ItemResource) snapshotKey.resourceKey()).normalize(), (short) +1);
         } catch (Exception ignored) {
         }
 
@@ -34,11 +35,13 @@ public class FlowScopeStorageListener implements RootStorageListener {
 
     @Override
     public void changed(MutableResourceList.OperationResult change) {
-        if (change.change() >= 0) return; // filtering only exported items
+        if (change.change() >= 0)
+            return; // filtering only exported items
 
         ResourceChangeKey snapshotKey = new ResourceChangeKey((PlatformResourceKey) change.resource(), (short) -1);
         try {
-            snapshotKey = new ResourceChangeKey((PlatformResourceKey) ((ItemResource) snapshotKey.resourceKey()).normalize(), (short) +1);
+            snapshotKey = new ResourceChangeKey(
+                    (PlatformResourceKey) ((ItemResource) snapshotKey.resourceKey()).normalize(), (short) -1);
         } catch (Exception ignored) {
         }
 
