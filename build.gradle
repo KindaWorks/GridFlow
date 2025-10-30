@@ -3,7 +3,7 @@ plugins {
     id 'net.neoforged.moddev' version '2.0.95'
 }
 
-version = '0.1.1'
+version = '0.1.2'
 base.archivesName = "gridflow"
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
