@@ -17,7 +17,12 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.refinedmods.refinedstorage.common.api.RefinedStorageClientApi;
 import com.refinedmods.refinedstorage.common.api.support.resource.PlatformResourceKey;
 import com.refinedmods.refinedstorage.common.api.support.resource.ResourceRendering;
+import com.refinedmods.refinedstorage.common.support.widget.History;
 import com.refinedmods.refinedstorage.common.support.widget.ScrollbarWidget;
+import com.refinedmods.refinedstorage.common.support.widget.SearchFieldWidget;
+import com.refinedmods.refinedstorage.common.support.widget.SearchIconWidget;
+
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
@@ -38,8 +43,9 @@ import java.util.*;
 import java.util.List;
 import java.util.function.Function;
 
-public class FlowScopeMenuScreen extends AbstractContainerScreen<FlowScopeMenuMenu> implements GridFlowModScreens.ScreenAccessor {
-    //#region Properties
+public class FlowScopeMenuScreen extends AbstractContainerScreen<FlowScopeMenuMenu>
+        implements GridFlowModScreens.ScreenAccessor {
+    // #region Properties
     final int PRODUCTION_GREEN = 0xff00ff00;
     final int CONSUMPTION_RED = 0xffff0000;
     final int ESTIMATES_BLUE = 0xff66ddff;
@@ -68,13 +74,14 @@ public class FlowScopeMenuScreen extends AbstractContainerScreen<FlowScopeMenuMe
     SortingDirection sortingDirection = SortingDirection.DESCENDING;
     Button button_done;
     ScrollbarWidget scrollbar;
+    SearchFieldWidget searchField;
     Granularity granularity = Granularity.MINUTE;
     TickScheduler tickScheduler = new TickScheduler(granularity.getTickAmount());
     private Map<PlatformResourceKey, Map<Short, Long>> lastSnapshot = new HashMap<>();
     private boolean hasDetailedGenerationData = false;
 
-    //#endregion
-    //#region Constructor
+    // #endregion
+    // #region Constructor
     public FlowScopeMenuScreen(FlowScopeMenuMenu container, Inventory inventory, Component text) {
         super(container, inventory, text);
         this.world = container.world;
@@ -89,28 +96,27 @@ public class FlowScopeMenuScreen extends AbstractContainerScreen<FlowScopeMenuMe
                 ResourceLocation.fromNamespaceAndPath("refinedstorage", "widget/side_button/base"),
                 null,
                 ResourceLocation.fromNamespaceAndPath("refinedstorage", "widget/side_button/hovered"),
-                null
-        );
+                null);
     }
 
-    //#endregion
-    //#region Rendering screens
+    // #endregion
+    // #region Rendering screens
     private void renderDetailedGenerationStats(GuiGraphics guiGraphics, int mouseX, int mouseY) {
         RenderSystem.defaultBlendFunc();
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(0, 0, 200);
 
         guiGraphics.blit(ResourceLocation.parse(
-                        "gridflow:textures/screens/flow_scope_detail.png"),
+                "gridflow:textures/screens/flow_scope_detail.png"),
                 this.leftPos - 3, this.topPos,
                 0, 0, 256, 256, 256, 256);
 
         PlatformResourceKey itemKey = graph.getItemKey();
-        guiGraphics.drawString(font, this.title.getString() + " - Flow details", this.leftPos + 8, this.topPos + 6, 4210752, false);
+        guiGraphics.drawString(font, this.title.getString() + " - Flow details", this.leftPos + 8, this.topPos + 6,
+                4210752, false);
 
         graph.renderItem(guiGraphics, this.leftPos + 7, this.topPos + 26);
         guiGraphics.drawString(font, graph.getItemName(), this.leftPos + 36, this.topPos + 30, WHITE);
-
 
         final int graphLeft = this.leftPos + 7;
         final int graphBottom = this.topPos + 134;
@@ -118,7 +124,8 @@ public class FlowScopeMenuScreen extends AbstractContainerScreen<FlowScopeMenuMe
         final int graphHeight = graph.getGraphSize().y;
         graph.setGraphPos(graphLeft, graphBottom);
         if (graph.isLoading()) {
-            guiGraphics.drawString(font, "Loading...", graphLeft + (graphWidth / 4), graphBottom - (graphHeight / 2), WHITE);
+            guiGraphics.drawString(font, "Loading...", graphLeft + (graphWidth / 4), graphBottom - (graphHeight / 2),
+                    WHITE);
             return;
         }
 
@@ -126,39 +133,52 @@ public class FlowScopeMenuScreen extends AbstractContainerScreen<FlowScopeMenuMe
 
         // Main stats
         int PRODUCTION_ROW_SHIFT = 2;
-        guiGraphics.drawString(font, "Inflow", graphLeft + PRODUCTION_ROW_SHIFT, graphBottom + TEXT_LINE_HEIGHT + 2, PRODUCTION_GREEN);
-        guiGraphics.drawString(font, "Max: " + formatAmount(itemKey, graph.getMaxProduction()) + granularity.perStr(), graphLeft + PRODUCTION_ROW_SHIFT, graphBottom + 8 + TEXT_LINE_HEIGHT * 2, WHITE);
-        guiGraphics.drawString(font, "Min:  " + formatAmount(itemKey, graph.getMinProduction()) + granularity.perStr(), graphLeft + PRODUCTION_ROW_SHIFT, graphBottom + 8 + TEXT_LINE_HEIGHT * 3, WHITE);
+        guiGraphics.drawString(font, "Inflow", graphLeft + PRODUCTION_ROW_SHIFT, graphBottom + TEXT_LINE_HEIGHT + 2,
+                PRODUCTION_GREEN);
+        guiGraphics.drawString(font, "Max: " + formatAmount(itemKey, graph.getMaxProduction()) + granularity.perStr(),
+                graphLeft + PRODUCTION_ROW_SHIFT, graphBottom + 8 + TEXT_LINE_HEIGHT * 2, WHITE);
+        guiGraphics.drawString(font, "Min:  " + formatAmount(itemKey, graph.getMinProduction()) + granularity.perStr(),
+                graphLeft + PRODUCTION_ROW_SHIFT, graphBottom + 8 + TEXT_LINE_HEIGHT * 3, WHITE);
 
         int CONSUMPTION_ROW_SHIFT = 78;
-        guiGraphics.drawString(font, "Outflow", graphLeft + CONSUMPTION_ROW_SHIFT, graphBottom + TEXT_LINE_HEIGHT + 2, CONSUMPTION_RED);
-        guiGraphics.drawString(font, "Max: " + formatAmount(itemKey, graph.getMaxConsumption()) + granularity.perStr(), graphLeft + CONSUMPTION_ROW_SHIFT, graphBottom + 8 + TEXT_LINE_HEIGHT * 2, WHITE);
-        guiGraphics.drawString(font, "Min:  " + formatAmount(itemKey, graph.getMinConsumption()) + granularity.perStr(), graphLeft + CONSUMPTION_ROW_SHIFT, graphBottom + 8 + TEXT_LINE_HEIGHT * 3, WHITE);
+        guiGraphics.drawString(font, "Outflow", graphLeft + CONSUMPTION_ROW_SHIFT, graphBottom + TEXT_LINE_HEIGHT + 2,
+                CONSUMPTION_RED);
+        guiGraphics.drawString(font, "Max: " + formatAmount(itemKey, graph.getMaxConsumption()) + granularity.perStr(),
+                graphLeft + CONSUMPTION_ROW_SHIFT, graphBottom + 8 + TEXT_LINE_HEIGHT * 2, WHITE);
+        guiGraphics.drawString(font, "Min:  " + formatAmount(itemKey, graph.getMinConsumption()) + granularity.perStr(),
+                graphLeft + CONSUMPTION_ROW_SHIFT, graphBottom + 8 + TEXT_LINE_HEIGHT * 3, WHITE);
 
-        //Average lines
+        // Average lines
         guiGraphics.drawString(font, "Avg", graphLeft + graphWidth + 8, graphBottom - graphHeight - 14, WHITE);
 
         double decAvg = graph.getAvgConsumption();
         Vector2i decAvgPoint = graph.getGuiXYFromGraphValue(0, (long) decAvg);
-        graph.drawLine(guiGraphics, graphLeft, decAvgPoint.y, graphLeft + graphWidth + 20, decAvgPoint.y, CONSUMPTION_RED, 1, LineStyle.EXACT);
+        graph.drawLine(guiGraphics, graphLeft, decAvgPoint.y, graphLeft + graphWidth + 20, decAvgPoint.y,
+                CONSUMPTION_RED, 1, LineStyle.EXACT);
 
         double incAvg = graph.getAvgProduction();
         Vector2i incAvgPoint = graph.getGuiXYFromGraphValue(0, (long) incAvg);
-        graph.drawLine(guiGraphics, graphLeft, incAvgPoint.y, graphLeft + graphWidth + 20, incAvgPoint.y, PRODUCTION_GREEN, 1, LineStyle.EXACT);
+        graph.drawLine(guiGraphics, graphLeft, incAvgPoint.y, graphLeft + graphWidth + 20, incAvgPoint.y,
+                PRODUCTION_GREEN, 1, LineStyle.EXACT);
 
-        //Average line values
+        // Average line values
         int AVG_VALUE_SHIFT = 3;
         if (incAvg >= decAvg) {
-            guiGraphics.drawString(font, "+" + formatAmount(itemKey, (long) incAvg) + granularity.perStr(), graphLeft + graphWidth + AVG_VALUE_SHIFT, incAvgPoint.y - 10, PRODUCTION_GREEN);
-            guiGraphics.drawString(font, "-" + formatAmount(itemKey, (long) decAvg) + granularity.perStr(), graphLeft + graphWidth + AVG_VALUE_SHIFT, decAvgPoint.y + 2, CONSUMPTION_RED);
+            guiGraphics.drawString(font, "+" + formatAmount(itemKey, (long) incAvg) + granularity.perStr(),
+                    graphLeft + graphWidth + AVG_VALUE_SHIFT, incAvgPoint.y - 10, PRODUCTION_GREEN);
+            guiGraphics.drawString(font, "-" + formatAmount(itemKey, (long) decAvg) + granularity.perStr(),
+                    graphLeft + graphWidth + AVG_VALUE_SHIFT, decAvgPoint.y + 2, CONSUMPTION_RED);
         } else {
-            guiGraphics.drawString(font, "+" + formatAmount(itemKey, (long) incAvg) + granularity.perStr(), graphLeft + graphWidth + AVG_VALUE_SHIFT, incAvgPoint.y + 2, PRODUCTION_GREEN);
-            guiGraphics.drawString(font, "-" + formatAmount(itemKey, (long) decAvg) + granularity.perStr(), graphLeft + graphWidth + AVG_VALUE_SHIFT, decAvgPoint.y - 10, CONSUMPTION_RED);
+            guiGraphics.drawString(font, "+" + formatAmount(itemKey, (long) incAvg) + granularity.perStr(),
+                    graphLeft + graphWidth + AVG_VALUE_SHIFT, incAvgPoint.y + 2, PRODUCTION_GREEN);
+            guiGraphics.drawString(font, "-" + formatAmount(itemKey, (long) decAvg) + granularity.perStr(),
+                    graphLeft + graphWidth + AVG_VALUE_SHIFT, decAvgPoint.y - 10, CONSUMPTION_RED);
         }
 
         // Estimates
         int ESTIMATES_ROW_SHIFT = 159;
-        guiGraphics.drawString(font, "Estimates (net)", graphLeft + ESTIMATES_ROW_SHIFT, graphBottom + 25, ESTIMATES_BLUE);
+        guiGraphics.drawString(font, "Estimates (net)", graphLeft + ESTIMATES_ROW_SHIFT, graphBottom + 25,
+                ESTIMATES_BLUE);
         long seconds = (long) Granularity.SECOND.convertFrom(granularity, graph.getNetAvg());
         guiGraphics.drawString(font, formatSignedAmount(itemKey, seconds) + Granularity.SECOND.perStr(),
                 graphLeft + ESTIMATES_ROW_SHIFT, graphBottom + 5 + TEXT_LINE_HEIGHT * 3, WHITE);
@@ -174,8 +194,10 @@ public class FlowScopeMenuScreen extends AbstractContainerScreen<FlowScopeMenuMe
 
         // Overall stats
         final long net = Arrays.stream(graph.getNetData()).sum();
-        guiGraphics.drawString(font, "Total in storage: " + graph.getTotalStored(), graphLeft + PRODUCTION_ROW_SHIFT, graphBottom + 4 + TEXT_LINE_HEIGHT * 5, WHITE);
-        guiGraphics.drawString(font, "Net in this timeframe: " + (net > 0 ? "+" : "") + formatAmount(itemKey, net), graphLeft + PRODUCTION_ROW_SHIFT, graphBottom + 4 + TEXT_LINE_HEIGHT * 6, WHITE);
+        guiGraphics.drawString(font, "Total in storage: " + graph.getTotalStored(), graphLeft + PRODUCTION_ROW_SHIFT,
+                graphBottom + 4 + TEXT_LINE_HEIGHT * 5, WHITE);
+        guiGraphics.drawString(font, "Net in this timeframe: " + (net > 0 ? "+" : "") + formatAmount(itemKey, net),
+                graphLeft + PRODUCTION_ROW_SHIFT, graphBottom + 4 + TEXT_LINE_HEIGHT * 6, WHITE);
 
         guiGraphics.pose().popPose();
     }
@@ -192,17 +214,29 @@ public class FlowScopeMenuScreen extends AbstractContainerScreen<FlowScopeMenuMe
 
         int counter = 0;
         itemButtons.clear();
-        for (Map.Entry<PlatformResourceKey, Map<Short, Long>> item : sortingDirection.sort(sortingType.sort(lastSnapshot)).entrySet()) {
+        for (Map.Entry<PlatformResourceKey, Map<Short, Long>> item : sortingDirection
+                .sort(sortingType.sort(lastSnapshot)).entrySet()) {
             final PlatformResourceKey itemKey = item.getKey();
             final Map<Short, Long> itemChange = item.getValue();
             final int itemX = INNER_LEFT + ((counter % NUMBER_OF_COLS) * rowWidth);
-            final int itemY = INNER_TOP + (Math.floorDiv(counter, NUMBER_OF_COLS) * ROW_HEIGHT) - (int) scrollbar.getOffset();
-            if (itemY > this.topPos + this.height) break;
+            final int itemY = INNER_TOP + (Math.floorDiv(counter, NUMBER_OF_COLS) * ROW_HEIGHT)
+                    - (int) scrollbar.getOffset();
+            ResourceRendering resourceRendering = RefinedStorageClientApi.INSTANCE
+                    .getResourceRendering(itemKey.getClass());
+
+            // filters
+            String name_filter = searchField.getValue();
+            if (name_filter.length() > 0) {
+                if (!resourceRendering.getDisplayName(itemKey).getString().toLowerCase().contains(name_filter))
+                    continue;
+            }
+
+            if (itemY > this.topPos + this.height)
+                break;
             if (itemY < this.topPos - ROW_HEIGHT) {
                 counter++;
                 continue;
             }
-            ResourceRendering resourceRendering = RefinedStorageClientApi.INSTANCE.getResourceRendering(itemKey.getClass());
 
             // Rendering buttons
             DynamicButton button = new DynamicButton(
@@ -211,8 +245,7 @@ public class FlowScopeMenuScreen extends AbstractContainerScreen<FlowScopeMenuMe
                     rowWidth - 1, ROW_HEIGHT - 1, "",
                     () -> requestDetailedGenerationStats(itemKey, true),
                     null,
-                    List.of(new ClientTextTooltip(resourceRendering.getDisplayName(itemKey).getVisualOrderText()))
-            );
+                    List.of(new ClientTextTooltip(resourceRendering.getDisplayName(itemKey).getVisualOrderText())));
             button.render(guiGraphics, mouseX, mouseY);
             itemButtons.add(button);
 
@@ -228,10 +261,13 @@ public class FlowScopeMenuScreen extends AbstractContainerScreen<FlowScopeMenuMe
             guiGraphics.drawString(font,
                     formatSignedAmount(itemKey, net) + granularity.perStr(),
                     left + 20, top + 5,
-                    (net > 0 ? PRODUCTION_GREEN : net < 0 ? CONSUMPTION_RED : WHITE)
-            );
-//            guiGraphics.drawString(font, "+"+ItemResourceRendering.INSTANCE.formatAmount(itemChange.get((short) +1), true)+granularity.perStr(), left + 20, top, PRODUCTION_GREEN);
-//            guiGraphics.drawString(font, "-"+ItemResourceRendering.INSTANCE.formatAmount(itemChange.get((short) -1), true)+granularity.perStr(), left + 20, top + 10, CONSUMPTION_RED);
+                    (net > 0 ? PRODUCTION_GREEN : net < 0 ? CONSUMPTION_RED : WHITE));
+            // guiGraphics.drawString(font,
+            // "+"+ItemResourceRendering.INSTANCE.formatAmount(itemChange.get((short) +1),
+            // true)+granularity.perStr(), left + 20, top, PRODUCTION_GREEN);
+            // guiGraphics.drawString(font,
+            // "-"+ItemResourceRendering.INSTANCE.formatAmount(itemChange.get((short) -1),
+            // true)+granularity.perStr(), left + 20, top + 10, CONSUMPTION_RED);
 
             counter++;
         }
@@ -245,12 +281,14 @@ public class FlowScopeMenuScreen extends AbstractContainerScreen<FlowScopeMenuMe
         RenderSystem.disableBlend();
     }
 
-    //#endregion
-    //#region Protocol
+    // #endregion
+    // #region Protocol
     private void requestDetailedGenerationStats(PlatformResourceKey itemKey, boolean manual) {
         if (entity instanceof Player player && player.containerMenu instanceof GridFlowModMenus.MenuAccessor menu) {
-            if (manual) graph.setLoading(true);
-            menu.sendMenuStateUpdate(player, 5, "detailedFactoryGenerationRequest", new ResourceChangeGranularityKey(itemKey, (short) 0, granularity.getTickAmount()), false);
+            if (manual)
+                graph.setLoading(true);
+            menu.sendMenuStateUpdate(player, 5, "detailedFactoryGenerationRequest",
+                    new ResourceChangeGranularityKey(itemKey, (short) 0, granularity.getTickAmount()), false);
         }
     }
 
@@ -271,9 +309,9 @@ public class FlowScopeMenuScreen extends AbstractContainerScreen<FlowScopeMenuMe
         }
     }
 
-    //#endregion
-    //#region Hooks
-    //#region Hooks -> IO
+    // #endregion
+    // #region Hooks
+    // #region Hooks -> IO
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (hasDetailedGenerationData) {
@@ -282,7 +320,8 @@ public class FlowScopeMenuScreen extends AbstractContainerScreen<FlowScopeMenuMe
                 hasDetailedGenerationData = false;
                 return true;
             }
-            if (graph.mouseClicked(mouseX, mouseY, button)) return true;
+            if (graph.mouseClicked(mouseX, mouseY, button))
+                return true;
         } else {
             // forward button
             if (button == 4) {
@@ -290,18 +329,20 @@ public class FlowScopeMenuScreen extends AbstractContainerScreen<FlowScopeMenuMe
                 return true;
             }
             for (DynamicButton b : itemButtons) {
-                if (INNER_LEFT < mouseX && mouseX < INNER_LEFT + INNER_WIDTH && INNER_TOP < mouseY && mouseY < INNER_TOP + INNER_HEIGHT)
-                    if (b.mouseClicked(mouseX, mouseY, button)) return true;
+                if (INNER_LEFT < mouseX && mouseX < INNER_LEFT + INNER_WIDTH && INNER_TOP < mouseY
+                        && mouseY < INNER_TOP + INNER_HEIGHT)
+                    if (b.mouseClicked(mouseX, mouseY, button))
+                        return true;
             }
         }
 
         for (DynamicButton b : sideButtons) {
-            if (b.mouseClicked(mouseX, mouseY, button)) return true;
+            if (b.mouseClicked(mouseX, mouseY, button))
+                return true;
         }
         if (scrollbar != null && scrollbar.mouseClicked(mouseX, mouseY, button)) {
             return true;
         }
-        System.out.printf("%f, %f - %d%n", mouseX, mouseY, button);
         return super.mouseClicked(mouseX, mouseY, button);
     }
 
@@ -319,7 +360,8 @@ public class FlowScopeMenuScreen extends AbstractContainerScreen<FlowScopeMenuMe
             return true;
         }
         if (hasDetailedGenerationData)
-            if (graph.mouseReleased(mx, my, button)) return true;
+            if (graph.mouseReleased(mx, my, button))
+                return true;
         return super.mouseReleased(mx, my, button);
     }
 
@@ -345,7 +387,7 @@ public class FlowScopeMenuScreen extends AbstractContainerScreen<FlowScopeMenuMe
         }
         return super.keyPressed(key, b, c);
     }
-    //#endregion
+    // #endregion
 
     @Override
     public void removed() {
@@ -366,6 +408,15 @@ public class FlowScopeMenuScreen extends AbstractContainerScreen<FlowScopeMenuMe
             this.minecraft.player.closeContainer();
         }).bounds(this.leftPos + 195, this.topPos + 205, 46, 20).build();
         this.addRenderableWidget(button_done);
+
+        searchField = new SearchFieldWidget(this.font, this.leftPos + 94 + 1 + 58, this.topPos + 6 + 1, 67,
+                new History(new ArrayList<String>()));
+        this.addWidget(searchField);
+        this.addRenderableWidget(
+                new SearchIconWidget(this.leftPos + 79 + 58, this.topPos + 5,
+                        () -> Component.literal("Search").withStyle(ChatFormatting.GRAY),
+                        this.searchField));
+
         scrollbar = new ScrollbarWidget(this.leftPos + 232, this.topPos + 20, ScrollbarWidget.Type.NORMAL, 180);
         this.addRenderableWidget(scrollbar);
 
@@ -375,8 +426,8 @@ public class FlowScopeMenuScreen extends AbstractContainerScreen<FlowScopeMenuMe
         sortingDirection = SortingDirection.values()[blockState.getValue(FlowScopeBlock.SORT_DIRECTION)];
     }
 
-    //#endregion
-    //#region Tick
+    // #endregion
+    // #region Tick
     protected void containerTick() {
         super.containerTick();
         if (tickScheduler.shouldRun()) {
@@ -389,8 +440,8 @@ public class FlowScopeMenuScreen extends AbstractContainerScreen<FlowScopeMenuMe
         }
     }
 
-    //#endregion
-    //#region Utils
+    // #endregion
+    // #region Utils
     private boolean isHoveringOverArea(final double x, final double y) {
         return isHovering(8, 20, 221, 180, x, y);
     }
@@ -402,12 +453,15 @@ public class FlowScopeMenuScreen extends AbstractContainerScreen<FlowScopeMenuMe
     private String formatSignedAmount(final PlatformResourceKey resourceKey, long amount) {
         final long unsignedAmount = Math.abs(amount);
         String formatted = formatAmount(resourceKey, unsignedAmount);
-        if (amount < 0) return "-" + formatted;
-        else return "+" + formatted;
+        if (amount < 0)
+            return "-" + formatted;
+        else
+            return "+" + formatted;
     }
 
-    //#endregion
-    //#region Rendering utils - these should probably live in a different package, as static
+    // #endregion
+    // #region Rendering utils - these should probably live in a different package,
+    // as static
     public void enableScissorFromGui(int guiX, int guiY, int guiWidth, int guiHeight) {
         Minecraft mc = Minecraft.getInstance();
         Window window = mc.getWindow();
@@ -421,8 +475,8 @@ public class FlowScopeMenuScreen extends AbstractContainerScreen<FlowScopeMenuMe
         RenderSystem.enableScissor(x, y, width, height);
     }
 
-    //#endregion
-    //#region Rendering pipeline
+    // #endregion
+    // #region Rendering pipeline
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
         super.render(guiGraphics, mouseX, mouseY, partialTicks);
@@ -431,6 +485,7 @@ public class FlowScopeMenuScreen extends AbstractContainerScreen<FlowScopeMenuMe
         if (hasDetailedGenerationData) {
             this.renderDetailedGenerationStats(guiGraphics, mouseX, mouseY);
         }
+        this.searchField.render(guiGraphics, 0, 0, 0.0F);
         this.renderTooltip(guiGraphics, mouseX, mouseY);
     }
 
@@ -439,7 +494,8 @@ public class FlowScopeMenuScreen extends AbstractContainerScreen<FlowScopeMenuMe
         RenderSystem.setShaderColor(1, 1, 1, 1);
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
-        guiGraphics.blit(ResourceLocation.parse("gridflow:textures/screens/flow_scope.png"), this.leftPos - 3, this.topPos, 0, 0, 256, 256, 256, 256);
+        guiGraphics.blit(ResourceLocation.parse("gridflow:textures/screens/flow_scope.png"), this.leftPos - 3,
+                this.topPos, 0, 0, 256, 256, 256, 256);
         RenderSystem.disableBlend();
     }
 
@@ -452,25 +508,25 @@ public class FlowScopeMenuScreen extends AbstractContainerScreen<FlowScopeMenuMe
                 null,
                 List.of(
                         new ClientTextTooltip(Component.literal("Sorting direction").getVisualOrderText()),
-                        new ClientTextTooltip(Component.literal(capitalCase.apply(sortingDirection.toString())).withColor(Color.LIGHT_GRAY.getRGB()).getVisualOrderText())
-                )
-        );
+                        new ClientTextTooltip(Component.literal(capitalCase.apply(sortingDirection.toString()))
+                                .withColor(Color.LIGHT_GRAY.getRGB()).getVisualOrderText())));
         sortingDirectionButton.render(guiGraphics, mouseX, mouseY);
         sideButtons.add(sortingDirectionButton);
 
-        DynamicButton sortingTypeButton = new DynamicButton(leftPos - 24, topPos + 6 + SIDE_BUTTON_ROW_HEIGHT, 18, 18, "",
+        DynamicButton sortingTypeButton = new DynamicButton(leftPos - 24, topPos + 6 + SIDE_BUTTON_ROW_HEIGHT, 18, 18,
+                "",
                 side_button_sprites, sortingType.getResourceLocation(),
                 () -> this.sortingType = SortingType.next(sortingType),
                 null,
                 List.of(
                         new ClientTextTooltip(Component.literal("Sorting Type").getVisualOrderText()),
-                        new ClientTextTooltip(Component.literal(capitalCase.apply(sortingType.toString())).withColor(Color.LIGHT_GRAY.getRGB()).getVisualOrderText())
-                )
-        );
+                        new ClientTextTooltip(Component.literal(capitalCase.apply(sortingType.toString()))
+                                .withColor(Color.LIGHT_GRAY.getRGB()).getVisualOrderText())));
         sortingTypeButton.render(guiGraphics, mouseX, mouseY);
         sideButtons.add(sortingTypeButton);
 
-        DynamicButton granularityButton = new DynamicButton(leftPos - 24, topPos + 6 + (SIDE_BUTTON_ROW_HEIGHT * 2), 18, 18, "",
+        DynamicButton granularityButton = new DynamicButton(leftPos - 24, topPos + 6 + (SIDE_BUTTON_ROW_HEIGHT * 2), 18,
+                18, "",
                 side_button_sprites, granularity.getResourceLocation(),
                 () -> {
                     this.granularity = Granularity.next(granularity);
@@ -483,13 +539,13 @@ public class FlowScopeMenuScreen extends AbstractContainerScreen<FlowScopeMenuMe
                 },
                 List.of(
                         new ClientTextTooltip(Component.literal("Granularity").getVisualOrderText()),
-                        new ClientTextTooltip(Component.literal(capitalCase.apply(granularity.toString())).withColor(Color.LIGHT_GRAY.getRGB()).getVisualOrderText())
-                )
-        );
+                        new ClientTextTooltip(Component.literal(capitalCase.apply(granularity.toString()))
+                                .withColor(Color.LIGHT_GRAY.getRGB()).getVisualOrderText())));
         granularityButton.render(guiGraphics, mouseX, mouseY);
         sideButtons.add(granularityButton);
 
-        DynamicButton styleButton = new DynamicButton(leftPos - 24, topPos + 6 + (SIDE_BUTTON_ROW_HEIGHT * 3), 18, 18, "",
+        DynamicButton styleButton = new DynamicButton(leftPos - 24, topPos + 6 + (SIDE_BUTTON_ROW_HEIGHT * 3), 18, 18,
+                "",
                 side_button_sprites, graph.lineStyle.getResourceLocation(),
                 () -> {
                     graph.lineStyle = LineStyle.next(graph.lineStyle);
@@ -497,9 +553,8 @@ public class FlowScopeMenuScreen extends AbstractContainerScreen<FlowScopeMenuMe
                 null,
                 List.of(
                         new ClientTextTooltip(Component.literal("Line Style").getVisualOrderText()),
-                        new ClientTextTooltip(Component.literal(capitalCase.apply(graph.lineStyle.toString())).withColor(Color.LIGHT_GRAY.getRGB()).getVisualOrderText())
-                )
-        );
+                        new ClientTextTooltip(Component.literal(capitalCase.apply(graph.lineStyle.toString()))
+                                .withColor(Color.LIGHT_GRAY.getRGB()).getVisualOrderText())));
         styleButton.render(guiGraphics, mouseX, mouseY);
         sideButtons.add(styleButton);
 
@@ -524,5 +579,5 @@ public class FlowScopeMenuScreen extends AbstractContainerScreen<FlowScopeMenuMe
         }
         super.renderTooltip(guiGraphics, mouseX, mouseY);
     }
-    //#endregion
+    // #endregion
 }
