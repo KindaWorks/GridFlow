@@ -2,7 +2,7 @@ package com.kindaworks.gridflow.block.entity;
 
 import com.kindaworks.gridflow.api.FlowScopeStorageListener;
 import com.kindaworks.gridflow.data.GridFlowSnapshotData;
-import com.kindaworks.gridflow.init.GridFlowModBlockEntities;
+import com.kindaworks.gridflow.init.GridflowModBlockEntities;
 import com.kindaworks.gridflow.resource.ResourceChangeGranularityKey;
 import com.kindaworks.gridflow.resource.ResourceChangeKey;
 import com.kindaworks.gridflow.util.TickScheduler;
@@ -33,7 +33,7 @@ public class FlowScopeBlockEntity extends AbstractBaseNetworkNodeContainerBlockE
     private GridFlowSnapshotData snapshotData;
 
     public FlowScopeBlockEntity(BlockPos position, BlockState state) {
-        super(GridFlowModBlockEntities.FLOW_SCOPE.get(), position, state, new FlowScopeNetworkNode(100));
+        super(GridflowModBlockEntities.FLOW_SCOPE.get(), position, state, new FlowScopeNetworkNode(100));
         setFactoryId();
     }
 

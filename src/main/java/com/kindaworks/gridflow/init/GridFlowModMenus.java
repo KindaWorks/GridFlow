@@ -3,7 +3,7 @@
  */
 package com.kindaworks.gridflow.init;
 
-import com.kindaworks.gridflow.GridFlowMod;
+import com.kindaworks.gridflow.GridflowMod;
 import com.kindaworks.gridflow.network.MenuStateUpdateMessage;
 import com.kindaworks.gridflow.world.inventory.FlowScopeMenuMenu;
 import net.minecraft.client.Minecraft;
@@ -21,21 +21,19 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-public class GridFlowModMenus {
-    public static final DeferredRegister<MenuType<?>> REGISTRY = DeferredRegister.create(Registries.MENU, GridFlowMod.MODID);
+public class GridflowModMenus {
+    public static final DeferredRegister<MenuType<?>> REGISTRY = DeferredRegister.create(Registries.MENU, GridflowMod.MODID);
     public interface MenuAccessor {
         Map<String, Object> getMenuState();
 
-        default Map<Integer, Slot> getSlots() {
-            return Collections.unmodifiableMap(new HashMap<>());
-        }
+        Map<Integer, Slot> getSlots();
 
         default void sendMenuStateUpdate(Player player, int elementType, String name, Object elementState, boolean needClientUpdate) {
             getMenuState().put(elementType + ":" + name, elementState);
             if (player instanceof ServerPlayer serverPlayer) {
                 PacketDistributor.sendToPlayer(serverPlayer, new MenuStateUpdateMessage(elementType, name, elementState));
             } else if (player.level().isClientSide) {
-                if (Minecraft.getInstance().screen instanceof GridFlowModScreens.ScreenAccessor accessor && needClientUpdate)
+                if (Minecraft.getInstance().screen instanceof GridflowModScreens.ScreenAccessor accessor && needClientUpdate)
                     accessor.updateMenuState(elementType, name, elementState);
                 PacketDistributor.sendToServer(new MenuStateUpdateMessage(elementType, name, elementState));
             }

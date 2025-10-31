@@ -7,8 +7,8 @@ import com.kindaworks.gridflow.client.gui.side_buttons.Granularity;
 import com.kindaworks.gridflow.client.gui.side_buttons.LineStyle;
 import com.kindaworks.gridflow.client.gui.side_buttons.SortingDirection;
 import com.kindaworks.gridflow.client.gui.side_buttons.SortingType;
-import com.kindaworks.gridflow.init.GridFlowModMenus;
-import com.kindaworks.gridflow.init.GridFlowModScreens;
+import com.kindaworks.gridflow.init.GridflowModMenus;
+import com.kindaworks.gridflow.init.GridflowModScreens;
 import com.kindaworks.gridflow.resource.ResourceChangeGranularityKey;
 import com.kindaworks.gridflow.util.TickScheduler;
 import com.kindaworks.gridflow.world.inventory.FlowScopeMenuMenu;
@@ -44,7 +44,7 @@ import java.util.List;
 import java.util.function.Function;
 
 public class FlowScopeMenuScreen extends AbstractContainerScreen<FlowScopeMenuMenu>
-        implements GridFlowModScreens.ScreenAccessor {
+        implements GridflowModScreens.ScreenAccessor {
     // #region Properties
     final int PRODUCTION_GREEN = 0xff00ff00;
     final int CONSUMPTION_RED = 0xffff0000;
@@ -284,7 +284,7 @@ public class FlowScopeMenuScreen extends AbstractContainerScreen<FlowScopeMenuMe
     // #endregion
     // #region Protocol
     private void requestDetailedGenerationStats(PlatformResourceKey itemKey, boolean manual) {
-        if (entity instanceof Player player && player.containerMenu instanceof GridFlowModMenus.MenuAccessor menu) {
+        if (entity instanceof Player player && player.containerMenu instanceof GridflowModMenus.MenuAccessor menu) {
             if (manual)
                 graph.setLoading(true);
             menu.sendMenuStateUpdate(player, 5, "detailedFactoryGenerationRequest",
@@ -293,7 +293,7 @@ public class FlowScopeMenuScreen extends AbstractContainerScreen<FlowScopeMenuMe
     }
 
     private void requestSimpleGenerationStats() {
-        if (entity instanceof Player player && player.containerMenu instanceof GridFlowModMenus.MenuAccessor menu) {
+        if (entity instanceof Player player && player.containerMenu instanceof GridflowModMenus.MenuAccessor menu) {
             menu.sendMenuStateUpdate(player, 4, "simpleFactoryGenerationRequest", granularity.getTickAmount(), false);
         }
     }

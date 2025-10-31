@@ -1,20 +1,22 @@
 package com.kindaworks.gridflow.world.inventory;
 
-import com.kindaworks.gridflow.init.GridFlowModMenus;
+import com.kindaworks.gridflow.init.GridflowModMenus;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerLevelAccess;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-public class FlowScopeMenuMenu extends AbstractContainerMenu implements GridFlowModMenus.MenuAccessor {
+public class FlowScopeMenuMenu extends AbstractContainerMenu implements GridflowModMenus.MenuAccessor {
     public final Map<String, Object> menuState = new HashMap<>() {
         @Override
         public Object put(String key, Object value) {
@@ -30,7 +32,7 @@ public class FlowScopeMenuMenu extends AbstractContainerMenu implements GridFlow
     private ContainerLevelAccess access = ContainerLevelAccess.NULL;
 
     public FlowScopeMenuMenu(int id, Inventory inv, FriendlyByteBuf extraData) {
-        super(GridFlowModMenus.FLOW_SCOPE_MENU.get(), id);
+        super(GridflowModMenus.FLOW_SCOPE_MENU.get(), id);
         this.entity = inv.player;
         this.world = inv.player.level();
         if (extraData != null) {
@@ -45,7 +47,8 @@ public class FlowScopeMenuMenu extends AbstractContainerMenu implements GridFlow
     @Override
     public boolean stillValid(Player player) {
         if (this.boundBlockEntity != null)
-            return AbstractContainerMenu.stillValid(this.access, player, this.boundBlockEntity.getBlockState().getBlock());
+            return AbstractContainerMenu.stillValid(this.access, player,
+                    this.boundBlockEntity.getBlockState().getBlock());
         return true;
     }
 
@@ -57,5 +60,10 @@ public class FlowScopeMenuMenu extends AbstractContainerMenu implements GridFlow
     @Override
     public Map<String, Object> getMenuState() {
         return menuState;
+    }
+
+    @Override
+    public Map<Integer, Slot> getSlots() {
+        return Collections.unmodifiableMap(new HashMap<>());
     }
 }

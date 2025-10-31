@@ -11,11 +11,11 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.BlockItem;
 
-import com.kindaworks.gridflow.GridFlowMod;
+import com.kindaworks.gridflow.GridflowMod;
 
-public class GridFlowModItems {
-	public static final DeferredRegister.Items REGISTRY = DeferredRegister.createItems(GridFlowMod.MODID);
-	public static final DeferredItem<Item> FLOW_SCOPE = block(GridFlowModBlocks.FLOW_SCOPE);
+public class GridflowModItems {
+	public static final DeferredRegister.Items REGISTRY = DeferredRegister.createItems(GridflowMod.MODID);
+	public static final DeferredItem<Item> FLOW_SCOPE = block(GridflowModBlocks.FLOW_SCOPE);
 
 	// Start of user code block custom items
 	// End of user code block custom items

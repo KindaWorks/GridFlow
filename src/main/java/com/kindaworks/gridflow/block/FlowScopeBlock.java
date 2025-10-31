@@ -1,7 +1,7 @@
 package com.kindaworks.gridflow.block;
 
 import com.kindaworks.gridflow.block.entity.FlowScopeBlockEntity;
-import com.kindaworks.gridflow.init.GridFlowModBlockEntities;
+import com.kindaworks.gridflow.init.GridflowModBlockEntities;
 import com.kindaworks.gridflow.world.inventory.FlowScopeMenuMenu;
 import com.refinedmods.refinedstorage.common.support.AbstractBlockEntityTicker;
 import com.refinedmods.refinedstorage.common.support.AbstractDirectionalBlock;
@@ -43,7 +43,7 @@ public class FlowScopeBlock extends AbstractDirectionalBlock<BiDirection> implem
     public static final IntegerProperty SORT_DIRECTION = IntegerProperty.create("sort_direction", 0, 1);
     public static final IntegerProperty GRANULARITY = IntegerProperty.create("granularity", 0, 3);
     private static final AbstractBlockEntityTicker<FlowScopeBlockEntity> TICKER =
-            new NetworkNodeBlockEntityTicker<>(GridFlowModBlockEntities.FLOW_SCOPE, ACTIVE);
+            new NetworkNodeBlockEntityTicker<>(GridflowModBlockEntities.FLOW_SCOPE, ACTIVE);
     public FlowScopeBlockEntity boundBlockEntity;
 
     public FlowScopeBlock() {

@@ -1,7 +1,7 @@
 package com.kindaworks.gridflow.network;
 
-import com.kindaworks.gridflow.GridFlowMod;
-import com.kindaworks.gridflow.init.GridFlowModScreens;
+import com.kindaworks.gridflow.GridflowMod;
+import com.kindaworks.gridflow.init.GridflowModScreens;
 import com.kindaworks.gridflow.procedures.LoadLiveSnapshotDataProcedure;
 import com.kindaworks.gridflow.resource.ResourceChangeGranularityKey;
 import com.kindaworks.gridflow.world.inventory.FlowScopeMenuMenu;
@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 @EventBusSubscriber
 public record MenuStateUpdateMessage(int elementType, String name, Object elementState) implements CustomPacketPayload {
 
-    public static final Type<MenuStateUpdateMessage> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(GridFlowMod.MODID, "guistate_update"));
+    public static final Type<MenuStateUpdateMessage> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(GridflowMod.MODID, "guistate_update"));
     public static final StreamCodec<RegistryFriendlyByteBuf, MenuStateUpdateMessage> STREAM_CODEC = StreamCodec.of(MenuStateUpdateMessage::write, MenuStateUpdateMessage::read);
 
     @SuppressWarnings("unchecked")
@@ -114,7 +114,7 @@ public record MenuStateUpdateMessage(int elementType, String name, Object elemen
                 } else {
                     menu.getMenuState().put(message.elementType + ":" + message.name, message.elementState);
                 }
-                if (context.flow() == PacketFlow.CLIENTBOUND && Minecraft.getInstance().screen instanceof GridFlowModScreens.ScreenAccessor accessor) {
+                if (context.flow() == PacketFlow.CLIENTBOUND && Minecraft.getInstance().screen instanceof GridflowModScreens.ScreenAccessor accessor) {
                     accessor.updateMenuState(message.elementType, message.name, message.elementState);
                 }
             }
@@ -126,7 +126,7 @@ public record MenuStateUpdateMessage(int elementType, String name, Object elemen
 
     @SubscribeEvent
     public static void registerMessage(FMLCommonSetupEvent event) {
-        GridFlowMod.addNetworkMessage(MenuStateUpdateMessage.TYPE, MenuStateUpdateMessage.STREAM_CODEC, MenuStateUpdateMessage::handleMenuState);
+        GridflowMod.addNetworkMessage(MenuStateUpdateMessage.TYPE, MenuStateUpdateMessage.STREAM_CODEC, MenuStateUpdateMessage::handleMenuState);
     }
 
     @Override

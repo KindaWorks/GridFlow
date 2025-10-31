@@ -21,8 +21,8 @@ import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 @Mod("gridflow")
-public class GridFlowMod {
-    public static final Logger LOGGER = LogManager.getLogger(GridFlowMod.class);
+public class GridflowMod {
+    public static final Logger LOGGER = LogManager.getLogger(GridflowMod.class);
     public static final String MODID = "gridflow";
     private static final Map<CustomPacketPayload.Type<?>, NetworkMessage<?>> MESSAGES = new HashMap<>();
     private static final Collection<Tuple<Runnable, Integer>> workQueue = new ConcurrentLinkedQueue<>();
@@ -30,19 +30,19 @@ public class GridFlowMod {
     // End of user code block mod methods
     private static boolean networkingRegistered = false;
 
-    public GridFlowMod(IEventBus modEventBus) {
+    public GridflowMod(IEventBus modEventBus) {
         // Start of user code block mod constructor
         // End of user code block mod constructor
         NeoForge.EVENT_BUS.register(this);
         modEventBus.addListener(this::registerNetworking);
 
-        GridFlowModBlocks.REGISTRY.register(modEventBus);
-        GridFlowModBlockEntities.REGISTRY.register(modEventBus);
-        GridFlowModItems.REGISTRY.register(modEventBus);
+        GridflowModBlocks.REGISTRY.register(modEventBus);
+        GridflowModBlockEntities.REGISTRY.register(modEventBus);
+        GridflowModItems.REGISTRY.register(modEventBus);
 
-        GridFlowModTabs.REGISTRY.register(modEventBus);
+        GridflowModTabs.REGISTRY.register(modEventBus);
 
-        GridFlowModMenus.REGISTRY.register(modEventBus);
+        GridflowModMenus.REGISTRY.register(modEventBus);
 
         // Start of user code block mod init
         // End of user code block mod init
