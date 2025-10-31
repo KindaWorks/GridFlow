@@ -19,32 +19,23 @@ public class FlowScopeStorageListener implements RootStorageListener {
         lastSnapshot = savedLastSnapshot;
     }
 
-    @Override
-    public long afterInsert(ResourceKey resourceKey, long amount) {
-        ResourceChangeKey snapshotKey = new ResourceChangeKey((PlatformResourceKey) resourceKey, (short) +1);
+    public ResourceChangeKey getSnapshotKey(PlatformResourceKey resourceKey, short sign) {
+        ResourceChangeKey snapshotKey = new ResourceChangeKey((PlatformResourceKey) resourceKey, sign);
         try {
             snapshotKey = new ResourceChangeKey(
-                    (PlatformResourceKey) ((ItemResource) snapshotKey.resourceKey()).normalize(), (short) +1);
+                    (PlatformResourceKey) ((ItemResource) snapshotKey.resourceKey()).normalize(), sign);
         } catch (Exception ignored) {
         }
-
-        long newDeltaChange = deltaChange.getOrDefault(snapshotKey, 0L) + amount;
-        deltaChange.put(snapshotKey, newDeltaChange);
-        return 0;
+        return snapshotKey;
     }
 
     @Override
     public void changed(MutableResourceList.OperationResult change) {
-        if (change.change() >= 0)
-            return; // filtering only exported items
-
-        ResourceChangeKey snapshotKey = new ResourceChangeKey((PlatformResourceKey) change.resource(), (short) -1);
-        try {
-            snapshotKey = new ResourceChangeKey(
-                    (PlatformResourceKey) ((ItemResource) snapshotKey.resourceKey()).normalize(), (short) -1);
-        } catch (Exception ignored) {
-        }
-
+        // Abstract condition to filter out network change
+        if ((Math.abs(change.change()) >= (change.amount() * .5)) && Math.abs(change.change()) > 30)
+            return;
+        short sign = (short) (change.change() >= 0 ? +1 : -1);
+        ResourceChangeKey snapshotKey = getSnapshotKey((PlatformResourceKey) change.resource(), sign);
         long newDeltaChange = deltaChange.getOrDefault(snapshotKey, 0L) + change.change();
         deltaChange.put(snapshotKey, newDeltaChange);
     }
