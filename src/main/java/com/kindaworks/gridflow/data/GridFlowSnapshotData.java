@@ -156,8 +156,7 @@ public class GridFlowSnapshotData extends SavedData {
                                 Map.Entry::getValue,
                                 Long::sum,
                                 LinkedHashMap::new)))
-                // precaution
-                .limit((long) granularity * maxSnapshotsForClientboundPacket)
+                .limit(maxSnapshotsForClientboundPacket)
                 .toList()
                 .reversed();
     }
